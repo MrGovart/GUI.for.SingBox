@@ -227,19 +227,9 @@ const renderRule = (rule: IDNSRule) => {
     </div>
     <div v-if="fields.type !== RuleType.RuleSet" class="form-item">
       {{ t('kernel.dns.rules.payload') }}
-      <Radio
+      <Input
         v-if="fields.type === RuleType.ClashMode"
         v-model="fields.payload"
-        :options="[
-          {
-            label: 'kernel.global',
-            value: ClashMode.Global,
-          },
-          {
-            label: 'kernel.direct',
-            value: ClashMode.Direct,
-          },
-        ]"
       />
       <Select
         v-else-if="fields.type === RuleType.Inbound"

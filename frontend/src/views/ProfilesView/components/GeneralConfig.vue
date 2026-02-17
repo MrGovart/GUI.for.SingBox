@@ -1,15 +1,27 @@
 <script lang="ts" setup>
 import { useI18n } from 'vue-i18n'
 
-import { ModeOptions, LogLevelOptions } from '@/constant/kernel'
+import { LogLevelOptions } from '@/constant/kernel'
 import { useBool } from '@/hooks'
 import { generateSecureKey } from '@/utils'
+import { useKernelApiStore } from '@/stores/kernelApi.ts'
 
 interface Props {
   outboundOptions: { label: string; value: string }[]
 }
 
 defineProps<Props>()
+
+const kernelApiStore = useKernelApiStore()
+
+const buildClashModeOptions = () => {
+  return kernelApiStore.config['mode-list'].map((mode) => {
+    return {
+      label: mode,
+      value: mode
+    }
+  })
+}
 
 const model = defineModel<{ log: IProfile['log']; experimental: IProfile['experimental'] }>({
   required: true,
@@ -23,7 +35,7 @@ const [showMore, toggleMore] = useBool(false)
   <div>
     <div class="form-item">
       {{ t('kernel.clash_api.default_mode') }}
-      <Radio v-model="model.experimental.clash_api.default_mode" :options="ModeOptions" />
+      <Radio v-model="model.experimental.clash_api.default_mode" :options="buildClashModeOptions()" />
     </div>
     <div class="form-item">
       {{ t('kernel.log.disabled') }}

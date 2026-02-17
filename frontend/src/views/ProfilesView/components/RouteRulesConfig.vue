@@ -16,7 +16,6 @@ import {
   RulesetFormat,
   RulesetType,
   RuleType,
-  ClashMode,
   Strategy,
 } from '@/enums/kernel'
 import { useBool } from '@/hooks'
@@ -232,19 +231,9 @@ const renderRule = (rule: IRule) => {
     </div>
     <div v-if="isSupportPayload" class="form-item">
       {{ t('kernel.route.rules.payload') }}
-      <Radio
+      <Input
         v-if="fields.type === RuleType.ClashMode"
         v-model="fields.payload"
-        :options="[
-          {
-            label: 'kernel.global',
-            value: ClashMode.Global,
-          },
-          {
-            label: 'kernel.direct',
-            value: ClashMode.Direct,
-          },
-        ]"
       />
       <Select
         v-else-if="fields.type === RuleType.Inbound"

@@ -3,7 +3,6 @@ import { ref, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { ProcessMemory } from '@/bridge'
-import { ModeOptions } from '@/constant/kernel'
 import { useEnvStore, useAppStore, useKernelApiStore, useAppSettingsStore } from '@/stores'
 import { formatBytes, handleChangeMode, message } from '@/utils'
 
@@ -235,7 +234,7 @@ onUnmounted(() => {
         </div>
       </Card>
     </div>
-    <div class="flex">
+    <div class="flex main-overview-container">
       <div class="w-[60%]">
         <div class="py-16 font-bold" style="color: var(--card-color)">
           {{ t('home.overview.traffic') }}
@@ -245,21 +244,20 @@ onUnmounted(() => {
           :legend="[t('home.overview.transmit'), t('home.overview.receive')]"
         />
       </div>
-      <div class="ml-12 flex-1">
+      <div class="ml-12 flex flex-col flex-1">
         <div class="py-16 font-bold" style="color: var(--card-color)">
           {{ t('kernel.mode') }}
         </div>
-        <div class="flex flex-col gap-12">
+        <div class="flex flex-col gap-12 mode-overview-container">
           <Card
-            v-for="mode in ModeOptions"
-            :key="mode.value"
-            :selected="kernelApiStore.config.mode === mode.value"
-            @click="handleChangeMode(mode.value as any)"
-            :title="t(mode.label)"
+            v-for="mode in kernelApiStore.config['mode-list']"
+            :key="mode"
+            :selected="kernelApiStore.config.mode === mode"
+            @click="handleChangeMode(mode as any)"
+            :title="mode"
+            :isMode="true"
             class="cursor-pointer"
-          >
-            <div class="text-12 py-2">{{ t(mode.desc) }}</div>
-          </Card>
+          />
         </div>
       </div>
     </div>

@@ -8,7 +8,6 @@ import {
   ShowMainWindow,
 } from '@/bridge'
 import { ColorOptions, ThemeOptions } from '@/constant/app'
-import { ModeOptions } from '@/constant/kernel'
 import i18n from '@/lang'
 import { useAppSettingsStore, useKernelApiStore, useEnvStore, usePluginsStore } from '@/stores'
 import {
@@ -172,11 +171,11 @@ const getTrayMenus = () => {
       type: 'item',
       text: 'kernel.mode',
       hidden: !kernelApiStore.running,
-      children: ModeOptions.map((mode) => ({
+      children: kernelApiStore.config['mode-list'].map((mode) => ({
         type: 'item',
-        text: mode.label,
-        checked: kernelApiStore.config.mode === mode.value,
-        event: () => handleChangeMode(mode.value),
+        text: mode,
+        checked: kernelApiStore.config.mode === mode,
+        event: () => handleChangeMode(mode),
       })),
     },
     {

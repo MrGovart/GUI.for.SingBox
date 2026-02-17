@@ -559,7 +559,7 @@ export const handleUseProxy = async (group: any, proxy: any) => {
   await kernelApiStore.refreshProviderProxies()
 }
 
-export const handleChangeMode = async (mode: 'direct' | 'global' | 'rule') => {
+export const handleChangeMode = async (mode: string) => {
   const kernelApiStore = useKernelApiStore()
 
   if (mode === kernelApiStore.config.mode) return

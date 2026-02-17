@@ -1,6 +1,5 @@
 import { ExitApp, RestartApp, WindowReloadApp } from '@/bridge'
 import { ColorOptions, ThemeOptions } from '@/constant/app'
-import { ModeOptions } from '@/constant/kernel'
 import { PluginTrigger, PluginTriggerEvent } from '@/enums/app'
 import useI18n from '@/lang'
 import {
@@ -93,10 +92,10 @@ export const getCommands = () => {
         {
           label: 'kernel.mode',
           cmd: 'Core Mode',
-          children: ModeOptions.map((mode) => ({
-            label: mode.label,
-            cmd: mode.value,
-            handler: () => handleChangeMode(mode.value),
+          children: kernelStore.config['mode-list'].map((mode) => ({
+            label: mode,
+            cmd: mode,
+            handler: () => handleChangeMode(mode),
           })),
         },
       ],
