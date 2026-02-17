@@ -78,11 +78,11 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
   const refreshConfig = async () => {
     const _config = await getConfigs()
 
-    //TODO: get clashmode
     config.value = {
       ..._config,
       tun: config.value.tun,
     }
+
     if (!runtimeProfile) {
       const txt = await ReadFile(CoreConfigFilePath)
       runtimeProfile = restoreProfile(JSON.parse(txt))

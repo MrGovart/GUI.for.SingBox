@@ -49,28 +49,28 @@ const handleShowKernelLogs = () => {
   modalApi.setContent(KernelLogs).open()
 }
 
-let scrollEventCount = 0
-const resetScrollEventCount = debounce(() => (scrollEventCount = 0), 100)
+// let scrollEventCount = 0
+// const resetScrollEventCount = debounce(() => (scrollEventCount = 0), 100)
 
 const onMouseWheel = (e: WheelEvent) => {
-  if (!kernelApiStore.running) return
+  // if (!kernelApiStore.running) return
 
-  const isScrollingDown = e.deltaY > 0
+  // const isScrollingDown = e.deltaY > 0
 
-  if (
-    isScrollingDown ||
-    appSettingsStore.app.kernel.controllerCloseMode === ControllerCloseMode.All
-  ) {
-    const currentScrollTop = controllerRef.value?.scrollTop ?? 0
-    if (isScrollingDown || currentScrollTop === 0) {
-      scrollEventCount += 1
-    }
-    if (scrollEventCount >= appSettingsStore.app.kernel.controllerSensitivity) {
-      showController.value = isScrollingDown || currentScrollTop !== 0
-    }
-  }
+  // if (
+  //   isScrollingDown ||
+  //   appSettingsStore.app.kernel.controllerCloseMode === ControllerCloseMode.All
+  // ) {
+  //   const currentScrollTop = controllerRef.value?.scrollTop ?? 0
+  //   if (isScrollingDown || currentScrollTop === 0) {
+  //     scrollEventCount += 1
+  //   }
+  //   if (scrollEventCount >= appSettingsStore.app.kernel.controllerSensitivity) {
+  //     showController.value = isScrollingDown || currentScrollTop !== 0
+  //   }
+  // }
 
-  resetScrollEventCount()
+  // resetScrollEventCount()
 }
 
 watch(showController, (v) => {

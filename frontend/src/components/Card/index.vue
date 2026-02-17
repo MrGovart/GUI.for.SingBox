@@ -8,6 +8,7 @@ interface Props {
   subtitle?: string
   selected?: boolean
   disabled?: boolean
+  isMode?: boolean
 }
 
 const props = defineProps<Props>()
@@ -17,11 +18,12 @@ const slots = useSlots()
 const hasTitle = computed(() => {
   return slots.extra || slots['title-prefix'] || slots['title-suffix'] || props.title
 })
+
 </script>
 
 <template>
   <div class="gui-card rounded-8 relative flex flex-col">
-    <div v-if="hasTitle" class="card-header flex items-center break-all p-8">
+    <div v-if="hasTitle" class="card-header flex items-center break-all p-12">
       <slot name="title-prefix"></slot>
       <div v-if="title" v-tips="title" class="card-header_title line-clamp-1 text-16 font-bold">
         {{ title }}
@@ -32,7 +34,7 @@ const hasTitle = computed(() => {
       </div>
     </div>
     <div v-if="subtitle" class="card-header_subtitle mx-8">{{ subtitle }}</div>
-    <div class="flex-1 px-8" :class="hasTitle ? 'pb-8' : ''">
+    <div class="flex-1 px-12" :class="hasTitle && !props.isMode ? 'pb-8' : ''">
       <slot></slot>
     </div>
     <Icon
