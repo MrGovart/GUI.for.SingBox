@@ -23,14 +23,16 @@ import (
 var Config = &AppConfig{}
 
 var Env = &EnvResult{
-	IsStartup:   true,
-	FromTaskSch: false,
-	WebviewPath: "",
-	AppName:     "",
-	AppVersion:  "v1.16.0",
-	BasePath:    "",
-	OS:          sysruntime.GOOS,
-	ARCH:        sysruntime.GOARCH,
+	IsStartup:    true,
+	PreventExit:  true,
+	FromTaskSch:  false,
+	WebviewPath:  "",
+	AppName:      "",
+	AppVersion:   "v1.23.1",
+	BasePath:     "",
+	OS:           sysruntime.GOOS,
+	ARCH:         sysruntime.GOARCH,
+	IsPrivileged: false,
 }
 
 // NewApp creates a new App application struct
@@ -51,6 +53,10 @@ func CreateApp(fs embed.FS) *App {
 
 	if slices.Contains(os.Args, "tasksch") {
 		Env.FromTaskSch = true
+	}
+
+	if priv, err := IsPrivileged(); err == nil {
+		Env.IsPrivileged = priv
 	}
 
 	app := NewApp()
@@ -79,7 +85,14 @@ func (a *App) IsStartup() bool {
 	return false
 }
 
+func (a *App) ExitApp() {
+	log.Printf("ExitApp")
+	Env.PreventExit = false
+	runtime.Quit(a.Ctx)
+}
+
 func (a *App) RestartApp() FlagResult {
+	log.Printf("RestartApp")
 	exePath := Env.BasePath + "/" + Env.AppName
 
 	cmd := exec.Command(exePath)
@@ -94,13 +107,18 @@ func (a *App) RestartApp() FlagResult {
 	return FlagResult{true, "Success"}
 }
 
-func (a *App) GetEnv() EnvResult {
+func (a *App) GetEnv(key string) any {
+	log.Printf("GetEnv: %s", key)
+	if key != "" {
+		return os.Getenv(key)
+	}
 	return EnvResult{
-		AppName:    Env.AppName,
-		AppVersion: Env.AppVersion,
-		BasePath:   Env.BasePath,
-		OS:         Env.OS,
-		ARCH:       Env.ARCH,
+		AppName:      Env.AppName,
+		AppVersion:   Env.AppVersion,
+		BasePath:     Env.BasePath,
+		OS:           Env.OS,
+		ARCH:         Env.ARCH,
+		IsPrivileged: Env.IsPrivileged,
 	}
 }
 
@@ -122,6 +140,7 @@ func (a *App) GetInterfaces() FlagResult {
 }
 
 func (a *App) ShowMainWindow() {
+	log.Printf("ShowMainWindow")
 	runtime.WindowShow(a.Ctx)
 }
 

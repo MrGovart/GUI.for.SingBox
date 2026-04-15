@@ -12,7 +12,18 @@ import type {
   PluginTrigger,
   ScheduledTasksType,
   RequestMethod,
+  OS,
 } from '@/enums/app'
+
+export interface AppEnv {
+  appName: string
+  appVersion: string
+  basePath: string
+  appPath: string
+  os: OS
+  arch: string
+  isPrivileged: boolean
+}
 
 export interface TrayContent {
   icon?: string
@@ -75,6 +86,7 @@ export interface AppSettings {
     cardColumns: number
     sortByDelay: boolean
     testUrl: string
+    testTimeout: number
     concurrencyLimit: number
     controllerCloseMode: ControllerCloseMode
     controllerSensitivity: number
@@ -115,6 +127,7 @@ export interface PluginConfiguration {
     | 'Select'
     | 'MultipleSelect'
     | 'Switch'
+    | 'ColorPicker'
     | ''
   value: any
   options: any[]
@@ -141,8 +154,6 @@ export interface Plugin {
   }
   configuration: PluginConfiguration[]
   disabled: boolean
-  install: boolean
-  installed: boolean
   status: number // 0: Normal 1: Running 2: Stopped
   // Not Config
   updating?: boolean

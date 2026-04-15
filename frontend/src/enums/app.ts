@@ -1,3 +1,9 @@
+export enum OS {
+  Windows = 'windows',
+  Linux = 'linux',
+  Darwin = 'darwin',
+}
+
 export enum WindowStartState {
   Normal = 0,
   Minimised = 2,
@@ -54,12 +60,15 @@ export enum ScheduledTasksType {
 }
 
 export enum PluginTrigger {
+  OnEnabled = 'on::enabled',
+  OnDisabled = 'on::disabled',
   OnManual = 'on::manual',
   OnSubscribe = 'on::subscribe',
   OnGenerate = 'on::generate',
   OnStartup = 'on::startup',
   OnShutdown = 'on::shutdown',
   OnReady = 'on::ready',
+  OnReload = 'on::reload',
   OnCoreStarted = 'on::core::started',
   OnCoreStopped = 'on::core::stopped',
   OnBeforeCoreStart = 'on::before::core::start',
@@ -68,6 +77,9 @@ export enum PluginTrigger {
 }
 
 export enum PluginTriggerEvent {
+  OnEnabled = 'onEnabled',
+  OnDisabled = 'onDisabled',
+  OnDispose = 'onDispose',
   OnInstall = 'onInstall',
   OnUninstall = 'onUninstall',
   OnManual = 'onRun',
@@ -77,6 +89,7 @@ export enum PluginTriggerEvent {
   OnStartup = 'onStartup',
   OnShutdown = 'onShutdown',
   OnReady = 'onReady',
+  OnReload = 'onReload',
   OnTask = 'onTask',
   OnConfigure = 'onConfigure',
   OnCoreStarted = 'onCoreStarted',

@@ -2,12 +2,9 @@
 import { ref } from 'vue'
 
 import { EventsOn, WindowHide, IsStartup } from '@/bridge'
-import { NavigationBar, TitleBar } from '@/components'
+import { NavigationBar, TitleBar, SplashView, AboutView, CommandView } from '@/components'
 import * as Stores from '@/stores'
 import { exitApp, sampleID, sleep, message } from '@/utils'
-import AboutView from '@/views/AboutView.vue'
-import CommandView from '@/views/CommandView.vue'
-import SplashView from '@/views/SplashView.vue'
 
 const loading = ref(true)
 const percent = ref(0)
@@ -156,11 +153,11 @@ envStore.setupEnv().then(async () => {
     class="fixed right-32 bottom-32"
   >
     <Button
-      @click="handleRestartCore"
       v-tips="'home.overview.restart'"
       :loading="kernelApiStore.restarting"
       icon="restart"
       class="rounded-full w-42 h-42 shadow"
+      @click="handleRestartCore"
     />
   </div>
 </template>

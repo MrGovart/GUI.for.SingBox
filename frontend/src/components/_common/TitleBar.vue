@@ -1,20 +1,21 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue'
 
+import logo from '@/assets/logo'
 import {
   WindowSetAlwaysOnTop,
   WindowHide,
   WindowMinimise,
   WindowSetSize,
-  WindowReloadApp,
   WindowToggleMaximise,
   WindowIsMaximised,
   RestartApp,
 } from '@/bridge'
 import { useAppSettingsStore, useKernelApiStore, useEnvStore, useAppStore } from '@/stores'
-import { APP_TITLE, APP_VERSION, debounce, exitApp } from '@/utils'
+import { APP_TITLE, APP_VERSION, debounce, exitApp, reloadApp } from '@/utils'
 
 import type { Menu } from '@/types/app'
+import { OS } from '@/enums/app'
 
 const isPinned = ref(false)
 const isMaximised = ref(false)
@@ -24,7 +25,7 @@ const kernelApiStore = useKernelApiStore()
 const envStore = useEnvStore()
 const appStore = useAppStore()
 
-const isDarwin = envStore.env.os === 'darwin'
+const isDarwin = envStore.env.os === OS.Darwin
 
 const pinWindow = () => {
   isPinned.value = !isPinned.value
@@ -46,7 +47,7 @@ const menus: Menu[] = [
   },
   {
     label: 'titlebar.reload',
-    handler: WindowReloadApp,
+    handler: reloadApp,
   },
   {
     label: 'titlebar.restart',
@@ -68,15 +69,15 @@ onUnmounted(() => window.removeEventListener('resize', onResize))
 
 <template>
   <div v-menu="menus" class="flex items-center py-8 gap-8 px-12" style="--wails-draggable: drag">
-    <img v-if="!isDarwin" class="w-24 h-24" draggable="false" src="@/assets/logo.png" />
+    <img v-if="!isDarwin" class="w-24 h-24" draggable="false" :src="logo" />
 
     <div
-      @dblclick="WindowToggleMaximise"
       :class="isDarwin ? 'justify-center py-4 text-12' : 'text-14'"
       :style="{
         color: kernelApiStore.running ? 'var(--primary-color)' : 'var(--color)',
       }"
       class="font-bold w-full h-full flex items-center"
+      @dblclick="WindowToggleMaximise"
     >
       {{ APP_TITLE }} {{ APP_VERSION }}
       <CustomAction :actions="appStore.customActions.title_bar" />
@@ -93,19 +94,19 @@ onUnmounted(() => window.removeEventListener('resize', onResize))
       class="ml-auto flex items-center gap-4"
       style="--wails-draggable: disabled"
     >
-      <Button @click.stop="pinWindow" type="text" :icon="isPinned ? 'pinFill' : 'pin'" />
-      <Button @click.stop="WindowMinimise" icon="minimize" type="text" />
+      <Button type="text" :icon="isPinned ? 'pinFill' : 'pin'" @click.stop="pinWindow" />
+      <Button icon="minimize" type="text" @click.stop="WindowMinimise" />
       <Button
-        @click.stop="WindowToggleMaximise"
         :icon="isMaximised ? 'maximize2' : 'maximize'"
         type="text"
+        @click.stop="WindowToggleMaximise"
       />
       <Button
-        @click.stop="closeWindow"
         :class="{ 'hover:!bg-red': appSettingsStore.app.exitOnClose }"
-        :loading="appStore.isAppExiting"
+        :loading="appStore.isAppExiting || appStore.isAppReloading"
         icon="close"
         type="text"
+        @click.stop="closeWindow"
       />
     </div>
   </div>

@@ -15,6 +15,7 @@ import { alert, deepClone, formatDate, isValidCron, message, sampleID } from '@/
 import Button from '@/components/Button/index.vue'
 
 import type { ScheduledTask } from '@/types/app'
+import { IsNotificationAvailable, RequestNotificationAuthorization } from '@/bridge'
 
 interface Props {
   id?: string
@@ -117,6 +118,20 @@ const handleViewNextRuns = () => {
   alert('Next Run Time', list.join('\n'))
 }
 
+const onNotificationChange = async (v: boolean) => {
+  if (v) {
+    try {
+      if (!(await IsNotificationAvailable())) {
+        throw 'Notifications not available on this platform'
+      }
+      await RequestNotificationAuthorization()
+    } catch (error: any) {
+      task.value.notification = false
+      message.warn(error)
+    }
+  }
+}
+
 if (props.id) {
   const s = scheduledTasksStore.getScheduledTaskById(props.id)
   if (s) {
@@ -163,8 +178,8 @@ defineExpose({ modalSlots })
       <div class="min-w-[75%]">
         <Input v-model="task.cron" :placeholder="t('scheduledtask.cronTips')" class="w-full">
           <template #suffix>
-            <Button @click="handleValidate" type="primary" size="small">Validate</Button>
-            <Button @click="handleViewNextRuns" type="primary" size="small" class="ml-4">
+            <Button type="primary" size="small" @click="handleValidate">Validate</Button>
+            <Button type="primary" size="small" class="ml-4" @click="handleViewNextRuns">
               Next Run Time
             </Button>
           </template>
@@ -181,7 +196,7 @@ defineExpose({ modalSlots })
     </div>
     <div class="form-item">
       {{ t('scheduledtask.notification') }}
-      <Switch v-model="task.notification" />
+      <Switch v-model="task.notification" @change="onNotificationChange" />
     </div>
 
     <div v-if="task.type === ScheduledTasksType.UpdateSubscription">
@@ -238,8 +253,8 @@ defineExpose({ modalSlots })
       <div class="grid grid-cols-3 gap-8">
         <Card
           v-for="p in pluginsStore.plugins"
-          v-tips="p.description"
           :key="p.id"
+          v-tips="p.description"
           :title="p.name"
           :selected="task.plugins.includes(p.id)"
           @click="handleUse(task.plugins, p.id)"

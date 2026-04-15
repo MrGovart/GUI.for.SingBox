@@ -34,8 +34,8 @@ export function FileExists(arg1) {
   return window['go']['bridge']['App']['FileExists'](arg1);
 }
 
-export function GetEnv() {
-  return window['go']['bridge']['App']['GetEnv']();
+export function GetEnv(arg1) {
+  return window['go']['bridge']['App']['GetEnv'](arg1);
 }
 
 export function GetInterfaces() {
@@ -60,10 +60,6 @@ export function MakeDir(arg1) {
 
 export function MoveFile(arg1, arg2) {
   return window['go']['bridge']['App']['MoveFile'](arg1, arg2);
-}
-
-export function Notify(arg1, arg2, arg3, arg4) {
-  return window['go']['bridge']['App']['Notify'](arg1, arg2, arg3, arg4);
 }
 
 export function OpenDir(arg1) {
@@ -136,6 +132,10 @@ export function UnzipZIPFile(arg1, arg2) {
 
 export function UpdateTray(arg1) {
   return window['go']['bridge']['App']['UpdateTray'](arg1);
+}
+
+export function UpdateTrayAndMenus(arg1, arg2) {
+  return window['go']['bridge']['App']['UpdateTrayAndMenus'](arg1, arg2);
 }
 
 export function UpdateTrayMenus(arg1) {

@@ -3,13 +3,19 @@ import {
   RestartApp,
   EventsOn,
   EventsOff,
-  UpdateTray,
-  UpdateTrayMenus,
   ShowMainWindow,
+  UpdateTrayAndMenus,
 } from '@/bridge'
 import { ColorOptions, ThemeOptions } from '@/constant/app'
 import i18n from '@/lang'
-import { useAppSettingsStore, useKernelApiStore, useEnvStore, usePluginsStore } from '@/stores'
+import {
+  useAppSettingsStore,
+  useKernelApiStore,
+  useEnvStore,
+  usePluginsStore,
+  useAppStore,
+  useProfilesStore,
+} from '@/stores'
 import {
   debounce,
   exitApp,
@@ -20,6 +26,7 @@ import {
 } from '@/utils'
 
 import type { MenuItem } from '@/types/app'
+import { OS } from '@/enums/app'
 
 const getTrayIcons = () => {
   const envStore = useEnvStore()
@@ -27,8 +34,8 @@ const getTrayIcons = () => {
   const kernelApiStore = useKernelApiStore()
 
   const themeMode = appSettings.themeMode
-  const ext = envStore.env.os === 'linux' ? '.png' : '.ico'
-  const folder = envStore.env.os === 'linux' ? 'imgs' : 'icons'
+  const ext = envStore.env.os === OS.Linux ? '.png' : '.ico'
+  const folder = envStore.env.os === OS.Linux ? 'imgs' : 'icons'
   let icon = `data/.cache/${folder}/tray_normal_${themeMode}${ext}`
 
   if (kernelApiStore.running) {
@@ -70,10 +77,12 @@ const generateUniqueEventsForMenu = (menus: MenuItem[]) => {
 }
 
 const getTrayMenus = () => {
+  const appStore = useAppStore()
   const envStore = useEnvStore()
   const appSettings = useAppSettingsStore()
   const kernelApiStore = useKernelApiStore()
   const pluginsStore = usePluginsStore()
+  const profilesStore = useProfilesStore()
 
   let pluginMenus: MenuItem[] = []
   let pluginMenusHidden = !appSettings.app.addPluginToMenu
@@ -84,8 +93,16 @@ const getTrayMenus = () => {
   if (!groupMenusHidden) {
     const { proxies } = kernelApiStore
     if (!proxies) return []
+    const hiddenList = (profilesStore.currentProfile?.outbounds || []).flatMap((v) =>
+      v.hidden ? v.tag : [],
+    )
     groupMenus = Object.values(proxies)
-      .filter((v) => ['Selector', 'URLTest'].includes(v.type) && v.name !== 'GLOBAL')
+      .filter(
+        (v) =>
+          ['Selector', 'URLTest'].includes(v.type) &&
+          v.name !== 'GLOBAL' &&
+          !hiddenList.includes(v.name),
+      )
       .concat(proxies.GLOBAL || [])
       .map((group) => {
         const all = (group.all || [])
@@ -160,12 +177,12 @@ const getTrayMenus = () => {
     {
       type: 'item',
       text: 'tray.showMainWindow',
-      hidden: envStore.env.os === 'windows',
+      hidden: envStore.env.os === OS.Windows,
       event: ShowMainWindow,
     },
     {
       type: 'separator',
-      hidden: envStore.env.os === 'windows',
+      hidden: envStore.env.os === OS.Windows,
     },
     {
       type: 'item',
@@ -277,7 +294,7 @@ const getTrayMenus = () => {
         {
           type: 'item',
           text: 'settings.lang.name',
-          children: appSettings.locales.map((v) => ({
+          children: appStore.locales.map((v) => ({
             type: 'item',
             text: v.label,
             checked: appSettings.app.lang === v.value,
@@ -312,18 +329,17 @@ const getTrayMenus = () => {
   return trayMenus
 }
 
-export const updateTrayMenus = debounce(async () => {
+export const updateTrayAndMenus = debounce(async () => {
   const trayMenus = getTrayMenus()
   const trayIcons = getTrayIcons()
   const pluginsStore = usePluginsStore()
 
-  const isDarwin = useEnvStore().env.os === 'darwin'
+  const isDarwin = useEnvStore().env.os === OS.Darwin
   const title = isDarwin ? '' : APP_TITLE
 
   const tray = { icon: trayIcons, title, tooltip: APP_TITLE + ' ' + APP_VERSION }
 
   const [finalTray, finalMenus] = await pluginsStore.onTrayUpdateTrigger(tray, trayMenus)
 
-  await UpdateTray(finalTray)
-  await UpdateTrayMenus(generateUniqueEventsForMenu(finalMenus) as any)
+  await UpdateTrayAndMenus(finalTray, generateUniqueEventsForMenu(finalMenus) as any)
 }, 500)

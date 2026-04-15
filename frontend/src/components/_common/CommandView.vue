@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, onUnmounted, nextTick, watch, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { useAppSettingsStore, usePluginsStore } from '@/stores'
+import { useAppSettingsStore, useAppStore, usePluginsStore } from '@/stores'
 import { debounce, message } from '@/utils'
 import { getCommands } from '@/utils/command'
 
@@ -27,6 +27,7 @@ const hitCommand = computed(() =>
 )
 
 const { t } = useI18n()
+const appStore = useAppStore()
 const appSettings = useAppSettingsStore()
 const pluginsStore = usePluginsStore()
 
@@ -89,7 +90,7 @@ const updateCommands = debounce(() => {
   commands.value = getCommands()
 }, 200)
 
-watch([() => appSettings.app.lang, pluginsStore.plugins, () => appSettings.locales], updateCommands)
+watch([() => appSettings.app.lang, pluginsStore.plugins, () => appStore.locales], updateCommands)
 
 onMounted(() => window.addEventListener('keydown', onKeydown))
 onUnmounted(() => window.removeEventListener('keydown', onKeydown))
@@ -127,15 +128,15 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
         <Card
           :title="c.label"
           :selected="index === selected"
-          @click="handleExecCommand(index)"
           class="mt-4"
           style="font-size: 12px"
+          @click="handleExecCommand(index)"
         >
           <div>{{ c.desc }}</div>
           <div>{{ c.cmd }}</div>
         </Card>
       </div>
-      <div class="p-4 text-12" v-show="hitCommand.length === 0">
+      <div v-show="hitCommand.length === 0" class="p-4 text-12">
         {{ t('commands.noMatching') }}
       </div>
     </div>

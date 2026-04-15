@@ -106,6 +106,7 @@ defineExpose({ modalSlots })
         <Input
           v-model="sub.url"
           :placeholder="sub.type === 'Http' ? 'http(s)://' : 'data/local/{filename}.json'"
+          allow-paste
           class="w-full"
         />
       </div>
@@ -117,7 +118,7 @@ defineExpose({ modalSlots })
       </div>
     </div>
     <Divider v-if="!isManual">
-      <Button @click="toggleShowMore" type="text" size="small">
+      <Button type="text" size="small" @click="toggleShowMore">
         {{ t('common.more') }}
       </Button>
     </Divider>

@@ -18,7 +18,7 @@ export function ExitApp():Promise<void>;
 
 export function FileExists(arg1:string):Promise<bridge.FlagResult>;
 
-export function GetEnv():Promise<bridge.EnvResult>;
+export function GetEnv(arg1:string):Promise<any>;
 
 export function GetInterfaces():Promise<bridge.FlagResult>;
 
@@ -31,8 +31,6 @@ export function ListServer():Promise<bridge.FlagResult>;
 export function MakeDir(arg1:string):Promise<bridge.FlagResult>;
 
 export function MoveFile(arg1:string,arg2:string):Promise<bridge.FlagResult>;
-
-export function Notify(arg1:string,arg2:string,arg3:string,arg4:bridge.NotifyOptions):Promise<bridge.FlagResult>;
 
 export function OpenDir(arg1:string):Promise<bridge.FlagResult>;
 
@@ -69,6 +67,8 @@ export function UnzipTarGZFile(arg1:string,arg2:string):Promise<bridge.FlagResul
 export function UnzipZIPFile(arg1:string,arg2:string):Promise<bridge.FlagResult>;
 
 export function UpdateTray(arg1:bridge.TrayContent):Promise<void>;
+
+export function UpdateTrayAndMenus(arg1:bridge.TrayContent,arg2:Array<bridge.MenuItem>):Promise<void>;
 
 export function UpdateTrayMenus(arg1:Array<bridge.MenuItem>):Promise<void>;
 

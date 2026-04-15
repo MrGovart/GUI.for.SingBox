@@ -25,7 +25,7 @@ var icon []byte
 func main() {
 	app := bridge.CreateApp(assets)
 
-	trayStart, _ := bridge.CreateTray(app, icon)
+	trayStart, trayEnd := bridge.CreateTray(app, icon)
 
 	// Create application with options
 	err := wails.Run(&options.App{
@@ -53,7 +53,7 @@ func main() {
 			WindowIsTranslucent:  true,
 			About: &mac.AboutInfo{
 				Title:   bridge.Env.AppName,
-				Message: "© 2025 GUI.for.Cores",
+				Message: "© 2026 GUI.for.Cores",
 				Icon:    icon,
 			},
 		},
@@ -81,9 +81,15 @@ func main() {
 		},
 		OnStartup: func(ctx context.Context) {
 			app.Ctx = ctx
+			runtime.InitializeNotifications(ctx)
 			trayStart()
 		},
 		OnBeforeClose: func(ctx context.Context) (prevent bool) {
+			if !bridge.Env.PreventExit {
+				trayEnd()
+				runtime.CleanupNotifications(ctx)
+				return false
+			}
 			runtime.EventsEmit(ctx, "onBeforeExitApp")
 			return true
 		},
