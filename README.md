@@ -7,7 +7,9 @@
 
 # Main Changes
 
-The original project has clash_mode values hardcoded to `'rule' | 'global' | 'direct'` values which limits usability and actually makes no sense as you would always use 'rule' mode logic if everything is properly configured per route rules.
+## Clash Modes
+
+The original app has clash_mode values hardcoded to `'rule' | 'global' | 'direct'` values which limits usability and actually makes no sense as you would always use 'rule' mode logic if everything is properly configured per route rules.
 
 The fork implements a logic of the original sing-box where clash_modes are parsed from config so it is now available to use custom clash_mode values and create your own rules based on them as originally intended. For example, to control DNS with proper DNS rules like:
 ```
@@ -29,12 +31,29 @@ The fork implements a logic of the original sing-box where clash_modes are parse
 
 <img width="872" height="539" alt="image" src="https://github.com/user-attachments/assets/2acb34a0-d4e8-40e6-b281-8ccebf1e3452" />
 
+## Remote Plugin Import
+
+The original app has remote Plugin import feature but it fetches only a code assuming that a response body is the code string.
+
+The fork is intended to use remote plugin import fetching metadata (name, version, menus, configuration) as well. It's like independent Plugin Hub alternative. It expect response body as code string (like the original app) or JSON with following structure:
+```
+{
+  "code": // code string,
+  "plugin": {
+    // plugin metadata following original Plugin type excluding some fields:
+    "configuration": ...
+    "menus": ...
+    "name": ...
+    "version": ...
+    "triggers": ...
+    "description": ...
+    // other fields are excluded
+  }
+}
+```
+
 ## What's is actually changed:
-- All hardcoded values for clash_mode is removed
-- Route and DNS rules payload input is a simple string input instead of a radio now.
-- Overview page and Profile Edit page now shows available clash_modes parsed from config.
-- Scroll event on Overview page that opens Controller is now removed (commented out) for the sake of scrollability of clash_modes.
-- Made some small visual fixes for Overview pages so it renders properly according to clash_mode behaviour changes.
+Check out [release description](https://github.com/MrGovart/GUI.for.SingBox/releases/tag/main)
 
 # Plans
 Original GUI has some other questionable UI/UX features that I'd like to improve in time.  
