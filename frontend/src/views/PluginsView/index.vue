@@ -145,7 +145,7 @@ const handleEditPluginCode = (id: string, title: string) => {
 const handleOnRun = async (p: Plugin) => {
   p.running = true
   try {
-    await pluginsStore.manualTrigger(p.id, PluginTriggerEvent.OnManual)
+    await pluginsStore.manualTrigger(p.id, PluginTriggerEvent.OnManual, p)
   } catch (error: any) {
     message.error(error)
   }
