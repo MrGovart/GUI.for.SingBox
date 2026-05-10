@@ -596,7 +596,7 @@ export const usePluginsStore = defineStore('plugins', () => {
       }
     }
 
-    let code = ''
+    let code: string | undefined = "";
 
     if (nextPlugin.type === 'File') {
       code = await ReadFile(nextPlugin.path).catch(() => '')
@@ -615,14 +615,14 @@ export const usePluginsStore = defineStore('plugins', () => {
       }
       if (typeof pluginData !== "string") {
         if (pluginData.plugin && pluginData.code) {
-          nextPlugin.configuration = pluginData.plugin.configuration;
-          nextPlugin.menus = pluginData.plugin.menus;
-          nextPlugin.name = pluginData.plugin.name;
-          nextPlugin.version = pluginData.plugin.version;
-          nextPlugin.triggers = pluginData.plugin.triggers;
-          nextPlugin.description = pluginData.plugin.description;
-          nextPlugin.hasUI = pluginData.plugin.hasUI;
-          code = pluginData.code;
+          nextPlugin.configuration = pluginData.plugin.configuration || plugin.configuration;
+          nextPlugin.menus = pluginData.plugin.menus || plugin.menus;
+          nextPlugin.name = pluginData.plugin.name || plugin.name;
+          nextPlugin.version = pluginData.plugin.version || plugin.version;
+          nextPlugin.triggers = pluginData.plugin.triggers || plugin.triggers;
+          nextPlugin.description = pluginData.plugin.description || plugin.description;
+          nextPlugin.hasUI = pluginData.plugin.hasUI || plugin.hasUI;
+          code = pluginData.code || undefined;
         } else {
           message.warn(t("plugins.httpErrorEmpty"));
         }
@@ -635,8 +635,8 @@ export const usePluginsStore = defineStore('plugins', () => {
       }
     }
 
-    if (nextPlugin.type !== 'File') {
-      await WriteFile(nextPlugin.path, code)
+    if (nextPlugin.type !== "File" && code) {
+      await WriteFile(nextPlugin.path, code);
     }
 
     await disposePluginInstance(nextPlugin.id)
