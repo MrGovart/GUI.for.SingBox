@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
+import useI18n from "@/lang";
 import { parse } from 'yaml'
 
 import { HttpGet, ReadFile, RemoveFile, WriteFile } from '@/bridge'
@@ -17,9 +18,12 @@ import {
   stringifyNoFolding,
   readonly,
   base64Encode,
-} from '@/utils'
+  message,
+} from "@/utils";
 
 import type { Plugin, Subscription, TrayContent, MenuItem } from '@/types/app'
+
+const { t } = useI18n.global;
 
 type PluginRuntimeCache = {
   plugin: Plugin
@@ -38,6 +42,13 @@ type PluginRuntimeCache = {
     >
   }
 }
+
+type PluginData =
+  | {
+      plugin: Plugin;
+      code: string;
+    }
+  | string;
 
 const PluginsCache: Recordable<PluginRuntimeCache> = {}
 
@@ -562,21 +573,21 @@ export const usePluginsStore = defineStore('plugins', () => {
         newPlugin.loading = plugin.loading
         newPlugin.running = plugin.running
         await editPlugin(plugin.id, deepClone(newPlugin))
-        const userSettigns = appSettingsStore.app.pluginSettings[plugin.id]
-        if (userSettigns) {
+        const userSettings = appSettingsStore.app.pluginSettings[plugin.id];
+        if (userSettings) {
           appSettingsStore.app.pluginSettings[plugin.id] = newPlugin.configuration.reduce(
             (p, c) => {
-              const value_now = userSettigns[c.key]
-              const value_new = c.value
-              const type_now = Array.isArray(value_now) ? 'array' : typeof value_now
-              const type_new = Array.isArray(value_new) ? 'array' : typeof value_new
+              const value_now = userSettings[c.key];
+              const value_new = c.value;
+              const type_now = Array.isArray(value_now) ? "array" : typeof value_now;
+              const type_new = Array.isArray(value_new) ? "array" : typeof value_new;
               return {
                 ...p,
                 [c.key]: type_now === type_new ? value_now : value_new,
-              }
+              };
             },
             {},
-          )
+          );
         }
         nextPlugin = newPlugin
       } else if (minor_now !== minor_new || patch_now !== patch_new) {
@@ -592,8 +603,36 @@ export const usePluginsStore = defineStore('plugins', () => {
     }
 
     if (nextPlugin.type === 'Http') {
-      const { body } = await HttpGet(nextPlugin.url)
-      code = body
+      let pluginData: PluginData = "";
+      let status: number = 0;
+      try {
+        [pluginData, status] = await HttpGet(nextPlugin.url).then((response) => [
+          response.body,
+          response.status,
+        ]);
+      } catch {
+        message.warn(t("plugins.httpErrorUnexpected"));
+      }
+      if (typeof pluginData !== "string") {
+        if (pluginData.plugin && pluginData.code) {
+          nextPlugin.configuration = pluginData.plugin.configuration;
+          nextPlugin.menus = pluginData.plugin.menus;
+          nextPlugin.name = pluginData.plugin.name;
+          nextPlugin.version = pluginData.plugin.version;
+          nextPlugin.triggers = pluginData.plugin.triggers;
+          nextPlugin.description = pluginData.plugin.description;
+          nextPlugin.hasUI = pluginData.plugin.hasUI;
+          code = pluginData.code;
+        } else {
+          message.warn(t("plugins.httpErrorEmpty"));
+        }
+      } else {
+        if (pluginData) {
+          code = pluginData;
+        } else if (status === 200) {
+          message.warn(t("plugins.httpErrorEmpty"));
+        }
+      }
     }
 
     if (nextPlugin.type !== 'File') {
