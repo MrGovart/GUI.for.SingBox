@@ -1,9 +1,6 @@
 name: Build GUI.for.SingBox
 
-on:
-  push:
-    tags:
-      - "v*"
+on: workflow_dispatch
 
 permissions:
   contents: write
@@ -11,7 +8,6 @@ permissions:
 jobs:
   Build-Frontend:
     runs-on: ubuntu-latest
-    if: github.repository == 'GUI-for-Cores/GUI.for.SingBox'
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
